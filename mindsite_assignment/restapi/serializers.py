@@ -4,9 +4,7 @@ from logerrors.models import ErrorLogs
 from users.models import Users
 from rest_framework.response import Response
 from random import randint
-import time
 from users.models import Users
-from multiprocessing import Process, process
 
 
 class ErrorLogSerializer(serializers.ModelSerializer):

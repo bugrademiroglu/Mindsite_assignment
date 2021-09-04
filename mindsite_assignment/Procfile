@@ -1,0 +1,1 @@
+web: gunicorn mindsite_assignment.wsgi

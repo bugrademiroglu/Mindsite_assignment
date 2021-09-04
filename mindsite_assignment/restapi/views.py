@@ -1,12 +1,9 @@
-import re
 from users.models import Users
 from jobs.models import Jobs
 from .serializers import JobSerializerCreate, ErrorLogSerializer, JobSerializerList, UserSerializerList
 from rest_framework import generics
 from logerrors.models import ErrorLogs
 from rest_framework.response import Response
-import multiprocessing
-from multiprocessing import Process
 from rest_framework import throttling
 
 #TODO: Cancel stop resume process simulasyon kismi kaldi

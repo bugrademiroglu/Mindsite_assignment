@@ -1,8 +1,5 @@
-
-from multiprocessing import process
 from users.models import Users
 from jobs.models import Jobs
-from logerrors.models import ErrorLogs
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -148,10 +145,8 @@ class GetRunningJobsTest(APITestCase):
 
     def test_can_get_running_jobs(self):
         job = Jobs.objects.get(id=self.job.id)
-        print("jobuu getir abi: ", job.status)
         response = self.client.get(reverse("running-job-view"))
         response_data = response.json()
-        print("response data ne ya: ",response_data)
         if (response_data[0]["status"] == "Running" and response_data[0]["finished"] == False):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
         else:

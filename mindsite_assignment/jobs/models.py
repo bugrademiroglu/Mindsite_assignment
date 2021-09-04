@@ -1,15 +1,7 @@
-from multiprocessing import process
-from os import name
 from django.db import models
-from rest_framework.fields import JSONField
 from users.models import Users
 import time
-import multiprocessing
 from multiprocessing import Process
-import threading
-import psutil
-from rest_framework.response import Response
-from django import db
 
 
 class Jobs(models.Model):
@@ -48,32 +40,50 @@ class Jobs(models.Model):
         return "JobProcess" + self.job_name + str(self.id)
 
     def _get_pids(self):
+        """ Inner function which is responsible to terminate running process
+        """
         if len(Jobs.pids_list) > 0:
             p = Jobs.pids_list.pop()
             p.terminate()
 
 
     def _save_processing_jobs(self,p):
+        """Inner function which is save the current process job in to the global list variable
+
+        Args:
+            p (Process): [Running process]
+        """
         Jobs.pids_list.append(p)
 
     def job_processing(self, seconds):
+        """When a job is created or restarted that method calls simulate the long running jobs
+
+        Args:
+            seconds (string): [Time to sleep]
+        """
         sec = int(seconds)
-        time.sleep(4)
+        time.sleep(sec)
         self.finished = True
         self.progress = False
         self.status = "Success"
         self.save()
 
     def start_job_process(self):
+        """When a job is created or restarted that method calls in order to start new process
+        """
         seconds = (self.end_time-self.start_time).seconds
         # operationalerror disk i/o error hatasi alindi :(
-        # p = Process(target=self.job_processing, args=[str(seconds)])
-        p = Process(target=self.job_processing(seconds))
+        p = Process(target=self.job_processing, args=[str(seconds)])
+        # p = Process(target=self.job_processing(seconds))
         p.start()
         self._save_processing_jobs(p)
 
     def get_detailed_job_info(self):
+        """That method prepare an information about specified job by the user.
 
+        Returns:
+            [dict]: [Information about a specified job]
+        """
         detailed_information = {
                                 "progress":self.progress,
                                 "status": self.status,
@@ -86,6 +96,11 @@ class Jobs(models.Model):
         return detailed_information
 
     def cancel_job_process(self):
+        """If user use that endpoint with specific job id then specified job will be terminate
+
+        Returns:
+            [Boolean]: [In case of not getting Failed or Cancelled the jobs status return False]
+        """
         if self.status is not "Failed" or self.status is not "Cancelled":
             self.status = "Cancelled"
             self.progress = False
@@ -95,6 +110,11 @@ class Jobs(models.Model):
             return False
     
     def stop_job(self):
+        """If user use that endpoint with specific job id then specified job will be stopped
+
+        Returns:
+            [Boolean]: [In case of not getting Failed or Cancelled the jobs status return False]
+        """
         if self.status is not "Failed" or self.staus is not "Cancelled":
             self.status = "Stopped"
             self.save()
@@ -107,6 +127,11 @@ class Jobs(models.Model):
             return False
     
     def resume_job(self):
+        """If user use that endpoint with specific job id then specified job will be resume
+
+        Returns:
+            [Boolean]: [In case of not getting Stopped or Running the jobs status return False]
+        """
         if self.status is "Stopped":
             self.status = "Running"
             self.save()
@@ -114,4 +139,7 @@ class Jobs(models.Model):
             return False
     
     def restart_job(self):
+        """If user use that endpoint with specific job id then specified job will be restarted
+        by calling start_job_process method
+        """
         self.start_job_process()

@@ -1,6 +1,8 @@
 from django.urls import path, include
 from rest_framework import views
-from .views import JobList, CreateJobs, StopJob ,CancelJob, ResumeJob, RestartJob, ListRunningJobs, LastTenJobs, GetFinishedJobs, GetDetailedJobInfo, GetLogs, GetAllLogs, UserList
+from .views import (JobList, CreateJobs, StopJob ,CancelJob, ResumeJob, RestartJob, ListRunningJobs, 
+                    LastTenJobs, GetFinishedJobs, GetDetailedJobInfo, GetLogs, GetAllLogs, UserList
+                   )
 
 urlpatterns = [
     path("getjobs/",
